@@ -18,7 +18,7 @@ SIN_COLOR='\033[0m'
 # Mostrar banner de inicio
 echo -e "${AZUL}"
 echo "====================================================="
-echo "       CONFIGURACIÓN DE STOCK ADVISOR               "
+echo "       STOCK ADVISOR DEPLOYMENT SETUP               "
 echo "====================================================="
 echo -e "${SIN_COLOR}"
 
@@ -28,30 +28,30 @@ verificar_comando() {
 }
 
 # ========== VERIFICACIÓN DE REQUISITOS PREVIOS ==========
-echo -e "${AMARILLO}Verificando requisitos previos...${SIN_COLOR}"
+echo -e "${AMARILLO}Checking system requirements...${SIN_COLOR}"
 
 # Verificar que Git esté instalado
 if ! verificar_comando git; then
-  echo -e "${ROJO}Error: Git no está instalado. Por favor, instala Git e intenta nuevamente.${SIN_COLOR}"
+  echo -e "${ROJO}Error: Git is not installed. Please install Git and try again.${SIN_COLOR}"
   exit 1
 fi
 
 # Verificar que Docker esté instalado
 if ! verificar_comando docker; then
-  echo -e "${ROJO}Error: Docker no está instalado. Por favor, instala Docker e intenta nuevamente.${SIN_COLOR}"
+  echo -e "${ROJO}Error: Docker is not installed. Please install Docker and try again.${SIN_COLOR}"
   exit 1
 fi
 
 # Verificar que Docker Compose esté instalado
 if ! verificar_comando docker-compose; then
-  echo -e "${ROJO}Error: Docker Compose no está instalado. Por favor, instala Docker Compose e intenta nuevamente.${SIN_COLOR}"
+  echo -e "${ROJO}Error: Docker Compose is not installed. Please install Docker Compose and try again.${SIN_COLOR}"
   exit 1
 fi
 
-echo -e "${VERDE}✓ Todos los requisitos previos están instalados.${SIN_COLOR}"
+echo -e "${VERDE}✓ All system requirements are met.${SIN_COLOR}"
 
 # ========== CLONACIÓN DE REPOSITORIOS ==========
-echo -e "${AMARILLO}Clonando repositorios...${SIN_COLOR}"
+echo -e "${AMARILLO}Cloning repositories...${SIN_COLOR}"
 
 # Crear directorio para repositorios si no existe
 mkdir -p repositories
@@ -59,23 +59,23 @@ cd repositories
 
 # Clonar repositorio de frontend
 if [ -d "stock-advisor-frontend" ]; then
-  echo "El repositorio de frontend ya existe. Actualizando..."
+  echo "Frontend repository already exists. Updating..."
   cd stock-advisor-frontend
   git pull
   cd ..
 else
-  echo "Clonando repositorio de frontend..."
+  echo "Cloning frontend repository..."
   git clone https://github.com/julianloaiza/stock-advisor-frontend.git
 fi
 
 # Clonar repositorio de backend
 if [ -d "stock-advisor-backend" ]; then
-  echo "El repositorio de backend ya existe. Actualizando..."
+  echo "Backend repository already exists. Updating..."
   cd stock-advisor-backend
   git pull
   cd ..
 else
-  echo "Clonando repositorio de backend..."
+  echo "Cloning backend repository..."
   git clone https://github.com/julianloaiza/stock-advisor-backend.git
 fi
 
@@ -83,7 +83,7 @@ fi
 cd ..
 
 # ========== LANZAR APLICACIÓN CON DOCKER COMPOSE ==========
-echo -e "${AMARILLO}Iniciando servicios con Docker Compose...${SIN_COLOR}"
+echo -e "${AMARILLO}Starting services with Docker Compose...${SIN_COLOR}"
 
 # Detener servicios si ya están corriendo
 docker-compose down
@@ -92,35 +92,35 @@ docker-compose down
 docker-compose up -d
 
 # ========== VERIFICACIÓN DE SERVICIOS ==========
-echo -e "${AMARILLO}Verificando que los servicios estén en funcionamiento...${SIN_COLOR}"
+echo -e "${AMARILLO}Verifying services are running...${SIN_COLOR}"
 
 # Esperar 10 segundos para que los servicios inicien
-echo "Esperando a que los servicios inicien..."
+echo "Waiting for services to start..."
 sleep 10
 
 # Verificar que los contenedores estén corriendo
 CONTENEDORES_CORRIENDO=$(docker-compose ps --services --filter "status=running" | wc -l)
 if [ "$CONTENEDORES_CORRIENDO" -lt 3 ]; then
-  echo -e "${AMARILLO}Advertencia: No todos los servicios están en funcionamiento todavía.${SIN_COLOR}"
-  echo "Puedes verificar el estado con: docker-compose ps"
-  echo "Verifica los logs con: docker-compose logs -f"
+  echo -e "${AMARILLO}Warning: Not all services are running.${SIN_COLOR}"
+  echo "You can check status with: docker-compose ps"
+  echo "Check logs with: docker-compose logs -f"
 else
-  echo -e "${VERDE}✓ Todos los servicios parecen estar funcionando correctamente.${SIN_COLOR}"
+  echo -e "${VERDE}✓ All services seem to be running correctly.${SIN_COLOR}"
 fi
 
 # ========== MENSAJE FINAL ==========
 echo -e "${VERDE}"
 echo "====================================================="
-echo "    ¡CONFIGURACIÓN DE STOCK ADVISOR COMPLETADA!     "
+echo "    STOCK ADVISOR DEPLOYMENT COMPLETED!              "
 echo "====================================================="
 echo -e "${SIN_COLOR}"
-echo -e "La aplicación está ahora disponible en:"
+echo -e "Application is now available at:"
 echo -e "${AZUL}• Frontend:${SIN_COLOR} http://localhost:5173"
-echo -e "${AZUL}• Documentación API:${SIN_COLOR} http://localhost:8080/swagger/index.html"
-echo -e "${AZUL}• Admin DB:${SIN_COLOR} http://localhost:9090"
+echo -e "${AZUL}• API Documentation:${SIN_COLOR} http://localhost:8080/swagger/index.html"
+echo -e "${AZUL}• DB Admin:${SIN_COLOR} http://localhost:9090"
 echo ""
-echo -e "Comandos útiles:"
-echo -e "${AMARILLO}• Ver logs:${SIN_COLOR} docker-compose logs -f"
-echo -e "${AMARILLO}• Detener servicios:${SIN_COLOR} docker-compose down"
-echo -e "${AMARILLO}• Reiniciar servicios:${SIN_COLOR} docker-compose restart"
+echo -e "Useful commands:"
+echo -e "${AMARILLO}• View logs:${SIN_COLOR} docker-compose logs -f"
+echo -e "${AMARILLO}• Stop services:${SIN_COLOR} docker-compose down"
+echo -e "${AMARILLO}• Restart services:${SIN_COLOR} docker-compose restart"
 echo ""
