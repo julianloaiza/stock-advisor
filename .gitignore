@@ -1,0 +1,42 @@
+# Directorios de repositorios clonados
+repositories/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Directorios de entornos de desarrollo
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos sensibles
+.env
+.env.local
+.env.development
+.env.production
+
+# Archivos de Node.js (por si acaso)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos compilados de Go (por si acaso)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Archivos de Docker
+.docker/
