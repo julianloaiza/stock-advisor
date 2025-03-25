@@ -134,6 +134,7 @@ stock-advisor-deployment/
 │   ├── start.sh           # Start services
 │   ├── stop.sh            # Stop services
 │   ├── reset.sh           # Reset services
+│   ├── restart.sh         # Restart services
 │   └── remove.sh          # Remove everything
 ├── sql/                   # Database scripts
 │   └── init-db.sql        # Database initialization
@@ -158,6 +159,7 @@ The repository includes several utility scripts to help manage the application:
 - **stop.sh**: Stop all services temporarily (keeps containers)
 - **shutdown.sh**: Shut down all services (removes containers but preserves data volumes)
 - **reset.sh**: Reset services (with or without data)
+- **restart.sh**: Restart services while preserving data and reloading configuration
 - **remove.sh**: Remove all containers, volumes, and networks (complete cleanup)
 
 ## Troubleshooting

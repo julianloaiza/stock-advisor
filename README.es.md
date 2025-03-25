@@ -133,7 +133,8 @@ stock-advisor-deployment/
 │   ├── setup.sh           # Script de configuración inicial
 │   ├── start.sh           # Iniciar servicios
 │   ├── stop.sh            # Detener servicios
-│   ├── reset.sh           # Reiniciar servicios
+│   ├── reset.sh           # Restablecer servicios
+│   ├── restart.sh         # Reiniciar services
 │   └── remove.sh          # Eliminar todo
 ├── sql/                   # Scripts de base de datos
 │   └── init-db.sql        # Inicialización de base de datos
@@ -157,7 +158,8 @@ El repositorio incluye varios scripts de utilidad para ayudar a gestionar la apl
 - **start.sh**: Iniciar todos los servicios (también puede reiniciar servicios después de shutdown o stop)
 - **stop.sh**: Detener todos los servicios temporalmente (mantiene los contenedores)
 - **shutdown.sh**: Apagar todos los servicios (elimina los contenedores pero preserva los volúmenes de datos)
-- **reset.sh**: Reiniciar servicios (con o sin datos)
+- **reset.sh**: Restablece servicios (con o sin datos)
+- **restart.sh**: Reiniciar servicios preservando datos y recargando configuración
 - **remove.sh**: Eliminar todos los contenedores, volúmenes y redes (limpieza completa)
 
 ## Solución de Problemas
