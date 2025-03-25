@@ -61,28 +61,13 @@ else
     echo -e "${YELLOW}Frontend repository already exists.${NC}"
 fi
 
-# Crear archivo init-db.sql si no existe
+# Verificar que el archivo init-db.sql existe
 if [ ! -f "sql/init-db.sql" ]; then
-    echo -e "${BLUE}Creating database initialization script...${NC}"
-    # Crear contenido para el archivo init-db.sql
-    cat > sql/init-db.sql << 'EOF'
--- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS stock_db;
-
--- Crear usuario sin contraseña (modo inseguro)
-CREATE USER IF NOT EXISTS stock_user;
-
--- Otorgar permisos completos sobre la base de datos
-GRANT ALL ON DATABASE stock_db TO stock_user;
-
--- Otorgar permisos en el esquema public
-GRANT ALL ON SCHEMA public TO stock_user;
-
--- Establecer permisos para tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO stock_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO stock_user;
-EOF
-    echo -e "${GREEN}Database initialization script created successfully.${NC}"
+    echo -e "${RED}Error: Database initialization script not found.${NC}"
+    echo -e "${YELLOW}The file sql/init-db.sql should be included in the repository.${NC}"
+    exit 1
+else
+    echo -e "${GREEN}Database initialization script found.${NC}"
 fi
 
 echo -e "${GREEN}Setup completed successfully.${NC}"
