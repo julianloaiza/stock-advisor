@@ -42,7 +42,7 @@ services:
       - ./sql/init-db.sql:/init-db.sql
     # Comando para crear la base de datos y configurar usuario con privilegios limitados
     command: >
-      sql --insecure --host=cockroach --execute="$(cat /init-db.sql)"
+      sql --insecure --host=cockroach --file=/init-db.sql
     networks:
       - stock-network
     # Reintentar automáticamente si falla

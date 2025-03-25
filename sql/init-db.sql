@@ -1,8 +1,8 @@
 -- Crear la base de datos
 CREATE DATABASE IF NOT EXISTS stock_db;
 
--- Crear usuario con contraseña
-CREATE USER IF NOT EXISTS stock_user WITH PASSWORD 'StockPass2025';
+-- Crear usuario sin contraseña (modo inseguro)
+CREATE USER IF NOT EXISTS stock_user;
 
 -- Otorgar permisos completos sobre la base de datos
 GRANT ALL ON DATABASE stock_db TO stock_user;
