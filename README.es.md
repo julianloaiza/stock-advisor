@@ -12,20 +12,24 @@ La aplicación Stock Advisor es una solución completa que incluye:
 
 ## Inicio Rápido
 
-La forma más sencilla de poner todo en funcionamiento es usar el script de configuración proporcionado:
+La forma más sencilla de poner todo en funcionamiento es usar los scripts proporcionados:
 
 ```bash
-# Hacer el script ejecutable
-chmod +x setup.sh
+# Hacer todos los scripts ejecutables
+chmod +x scripts/*.sh
 
 # Ejecutar el script de configuración
-./setup.sh
+./scripts/setup.sh
+
+# Iniciar los servicios
+./scripts/start.sh
 ```
 
 Esto automáticamente:
 1. Verificará las dependencias requeridas
 2. Clonará los repositorios necesarios
-3. Lanzará toda la pila de aplicaciones
+3. Verificará el script de inicialización de la base de datos
+4. Lanzará toda la pila de aplicaciones
 
 ## Configuración Manual
 
@@ -43,7 +47,13 @@ git clone https://github.com/julianloaiza/stock-advisor-backend.git
 cd ..
 ```
 
-2. Iniciar la aplicación:
+2. Asegúrate de que el directorio SQL exista:
+```bash
+mkdir -p sql
+# El script init-db.sql ya está incluido en el repositorio
+```
+
+3. Iniciar la aplicación:
 ```bash
 docker-compose up -d
 ```
@@ -52,20 +62,42 @@ docker-compose up -d
 
 Una vez en funcionamiento, los componentes de la aplicación están disponibles en:
 
-- **Frontend**: http://localhost:5173
-- **Documentación de la API**: http://localhost:8080/swagger/index.html
-- **Administrador de Base de Datos**: http://localhost:9090
+- **Frontend**: http://localhost:5173 (o el puerto configurado en `.env`)
+- **Documentación de la API**: http://localhost:8080/swagger/index.html (o usando el puerto de backend configurado)
+- **Administrador de Base de Datos**: http://localhost:9090 (o el puerto configurado en `.env`)
 
 ## Estructura del Repositorio
 
 ```
 stock-advisor-deployment/
 ├── docker-compose.yml     # Configuración principal para todos los servicios
+├── .env                   # Configuración de entorno
+├── .env.example           # Ejemplo de configuración de entorno
 ├── README.md              # Documentación en inglés
 ├── README.es.md           # Documentación en español (este archivo)
-├── setup.sh               # Script de configuración automatizado
-└── .gitignore             # Configuración de Git ignore
+├── scripts/               # Scripts de utilidad
+│   ├── setup.sh           # Script de configuración inicial
+│   ├── start.sh           # Iniciar servicios
+│   ├── stop.sh            # Detener servicios
+│   ├── reset.sh           # Reiniciar servicios
+│   └── remove.sh          # Eliminar todo
+├── sql/                   # Scripts de base de datos
+│   └── init-db.sql        # Inicialización de base de datos
+└── repositories/          # Repositorios de código fuente
+    ├── stock-advisor-frontend/
+    └── stock-advisor-backend/
 ```
+
+## Configuración
+
+La aplicación es completamente configurable a través del archivo `.env`. Las opciones clave de configuración incluyen:
+
+- **Configuración de base de datos**: Usuario, nombre de la base de datos
+- **Puertos de servicio**: Para todos los componentes (frontend, backend, base de datos)
+- **Configuración de API**: URL, token de autenticación
+- **Configuración de frontend**: URL de API, idioma predeterminado
+
+Puedes editar el archivo `.env` para personalizar el despliegue según tus necesidades.
 
 ## Repositorios de Componentes
 
@@ -74,20 +106,24 @@ La aplicación está dividida en dos repositorios principales:
 - **Frontend**: [julianloaiza/stock-advisor-frontend](https://github.com/julianloaiza/stock-advisor-frontend)
 - **Backend**: [julianloaiza/stock-advisor-backend](https://github.com/julianloaiza/stock-advisor-backend)
 
-## Comandos Comunes
+## Scripts de Utilidad
 
-- **Iniciar todos los servicios**: `docker-compose up -d`
-- **Ver logs**: `docker-compose logs -f`
-- **Detener todos los servicios**: `docker-compose down`
-- **Detener y eliminar volúmenes**: `docker-compose down -v`
+El repositorio incluye varios scripts de utilidad para ayudar a gestionar la aplicación:
+
+- **setup.sh**: Configuración inicial del entorno
+- **start.sh**: Iniciar todos los servicios
+- **stop.sh**: Detener todos los servicios
+- **reset.sh**: Reiniciar servicios (con o sin datos)
+- **remove.sh**: Eliminar todos los contenedores, volúmenes y redes
 
 ## Solución de Problemas
 
 Si encuentras algún problema:
 
 1. **Revisar logs**: `docker-compose logs -f [nombre_servicio]` (ej., `backend`, `frontend`, o `cockroach`)
-2. **Reiniciar servicios**: `docker-compose restart [nombre_servicio]`
+2. **Reiniciar servicios**: Ejecuta `./scripts/reset.sh`
 3. **Reconstruir contenedores**: `docker-compose up -d --build`
+4. **Verificar variables de entorno**: Asegúrate de que todas las variables requeridas estén configuradas en el archivo `.env`
 
 ## Requisitos del Sistema
 

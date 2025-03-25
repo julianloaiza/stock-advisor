@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script para configuración inicial
+# setup.sh - Script para configuración inicial
 
 # Colores para mensajes
 GREEN='\033[0;32m'
@@ -9,50 +9,86 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo -e "${BLUE}=================================================${NC}"
-echo -e "${BLUE}    Stock Advisor - Configuración Inicial        ${NC}"
+echo -e "${BLUE}    Stock Advisor - Initial Setup               ${NC}"
 echo -e "${BLUE}=================================================${NC}"
 
 # Verificar si Docker está instalado
 if ! command -v docker &> /dev/null; then
-    echo -e "${RED}Error: Docker no está instalado.${NC}"
+    echo -e "${RED}Error: Docker is not installed.${NC}"
     exit 1
 fi
 
 # Verificar si Docker Compose está instalado
 if ! command -v docker-compose &> /dev/null; then
-    echo -e "${RED}Error: Docker Compose no está instalado.${NC}"
+    echo -e "${RED}Error: Docker Compose is not installed.${NC}"
     exit 1
 fi
 
 # Crear directorios necesarios
-echo -e "${BLUE}Creando directorios necesarios...${NC}"
+echo -e "${BLUE}Creating necessary directories...${NC}"
 mkdir -p repositories
+mkdir -p sql
 
-# Copiar .env si no existe
+# Verificar y copiar .env.example a .env si es necesario
+if [ ! -f .env.example ]; then
+    echo -e "${RED}Error: .env.example file not found.${NC}"
+    exit 1
+fi
+
 if [ ! -f .env ]; then
-    echo -e "${BLUE}Creando archivo .env...${NC}"
+    echo -e "${BLUE}Creating .env file from example...${NC}"
     cp .env.example .env
-    echo -e "${GREEN}Archivo .env creado exitosamente.${NC}"
+    echo -e "${GREEN}Successfully created .env file.${NC}"
 else
-    echo -e "${YELLOW}El archivo .env ya existe, se mantiene su configuración.${NC}"
+    echo -e "${YELLOW}The .env file already exists. Keeping current configuration.${NC}"
 fi
 
 # Clonar repositorios si no existen
 if [ ! -d "repositories/stock-advisor-backend" ]; then
-    echo -e "${BLUE}Clonando repositorio del backend...${NC}"
-    git clone https://github.com/julianloaiza/stock-advisor-backend.git repositories/stock-advisor-backend
-    echo -e "${GREEN}Repositorio del backend clonado exitosamente.${NC}"
+    echo -e "${BLUE}Cloning backend repository...${NC}"
+    git clone https://github.com/julianloaiza/stock-advisor-backend.git repositories/stock-advisor-backend || {
+        echo -e "${RED}Error: Failed to clone backend repository.${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}Backend repository successfully cloned.${NC}"
 else
-    echo -e "${YELLOW}El repositorio del backend ya existe.${NC}"
+    echo -e "${YELLOW}Backend repository already exists.${NC}"
 fi
 
 if [ ! -d "repositories/stock-advisor-frontend" ]; then
-    echo -e "${BLUE}Clonando repositorio del frontend...${NC}"
-    git clone https://github.com/julianloaiza/stock-advisor-frontend.git repositories/stock-advisor-frontend
-    echo -e "${GREEN}Repositorio del frontend clonado exitosamente.${NC}"
+    echo -e "${BLUE}Cloning frontend repository...${NC}"
+    git clone https://github.com/julianloaiza/stock-advisor-frontend.git repositories/stock-advisor-frontend || {
+        echo -e "${RED}Error: Failed to clone frontend repository.${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}Frontend repository successfully cloned.${NC}"
 else
-    echo -e "${YELLOW}El repositorio del frontend ya existe.${NC}"
+    echo -e "${YELLOW}Frontend repository already exists.${NC}"
 fi
 
-echo -e "${GREEN}Configuración inicial completada exitosamente.${NC}"
-echo -e "${YELLOW}Para iniciar los servicios, ejecute: ./scripts/start.sh${NC}"
+# Crear archivo init-db.sql si no existe
+if [ ! -f "sql/init-db.sql" ]; then
+    echo -e "${BLUE}Creating database initialization script...${NC}"
+    # Crear contenido para el archivo init-db.sql
+    cat > sql/init-db.sql << 'EOF'
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS stock_db;
+
+-- Crear usuario sin contraseña (modo inseguro)
+CREATE USER IF NOT EXISTS stock_user;
+
+-- Otorgar permisos completos sobre la base de datos
+GRANT ALL ON DATABASE stock_db TO stock_user;
+
+-- Otorgar permisos en el esquema public
+GRANT ALL ON SCHEMA public TO stock_user;
+
+-- Establecer permisos para tablas futuras
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO stock_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO stock_user;
+EOF
+    echo -e "${GREEN}Database initialization script created successfully.${NC}"
+fi
+
+echo -e "${GREEN}Setup completed successfully.${NC}"
+echo -e "${YELLOW}To start the services, run: ./start.sh${NC}"

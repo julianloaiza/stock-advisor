@@ -11,8 +11,8 @@ services:
     image: cockroachdb/cockroach:latest-v25.1
     container_name: cockroach
     ports:
-      - "26257:26257"  # Puerto SQL para conexiones a la base de datos
-      - "9090:9090"    # Puerto para la interfaz web de administración
+      - "${COCKROACH_SQL_PORT:-26257}:26257"  # Puerto SQL para conexiones a la base de datos
+      - "${COCKROACH_UI_PORT:-9090}:8080"     # Puerto para la interfaz web de administración
     command: start-single-node --insecure
     volumes:
       # Volumen persistente para evitar pérdida de datos al reiniciar
@@ -58,7 +58,7 @@ services:
       dockerfile: Dockerfile
     container_name: stock-advisor-backend
     ports:
-      - "8080:8080"  # Expone la API en el puerto 8080
+      - "${BACKEND_PORT:-8080}:8080"  # Expone la API en el puerto 8080
     depends_on:
       # Solo inicia cuando la base de datos está inicializada
       - db-init
@@ -66,13 +66,13 @@ services:
       # Variables de entorno para configurar el backend
       - ADDRESS=:8080
       # Conexión en modo inseguro para desarrollo
-      - DATABASE_URL=postgresql://${DB_USER}@cockroach:26257/stock_db?sslmode=disable
-      - STOCK_API_URL=https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list
-      - STOCK_AUTH_TKN=${STOCK_AUTH_TKN}
-      - SYNC_MAX_ITERATIONS=100
-      - SYNC_TIMEOUT=100
+      - DATABASE_URL=postgresql://${DB_USER:-stock_user}@cockroach:26257/${DB_NAME:-stock_db}?sslmode=disable
+      - STOCK_API_URL=${STOCK_API_URL:-https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list}
+      - STOCK_AUTH_TKN=${STOCK_AUTH_TKN:-demo_token}
+      - SYNC_MAX_ITERATIONS=${SYNC_MAX_ITERATIONS:-100}
+      - SYNC_TIMEOUT=${SYNC_TIMEOUT:-60}
       # Orígenes permitidos para CORS (importante para comunicación con frontend)
-      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://frontend:5173,http://127.0.0.1:5173
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://frontend:5173,http://127.0.0.1:5173}
     networks:
       - stock-network
     restart: on-failure
@@ -87,14 +87,15 @@ services:
       dockerfile: Dockerfile
       args:
         # Pasar la URL de la API como argumento durante la construcción
-        - VITE_API_BASE_URL=http://localhost:8080
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:${BACKEND_PORT:-8080}}
+        - VITE_DEFAULT_LANGUAGE=${VITE_DEFAULT_LANGUAGE:-EN}
     container_name: stock-advisor-frontend
     ports:
-      - "5173:5173"  # Expone la UI en el puerto 5173
+      - "${FRONTEND_PORT:-5173}:5173"  # Expone la UI en el puerto 5173
     environment:
       # Variables de entorno para el frontend (runtime)
-      - VITE_API_BASE_URL=http://localhost:8080
-      - VITE_DEFAULT_LANGUAGE=ES
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:${BACKEND_PORT:-8080}}
+      - VITE_DEFAULT_LANGUAGE=${VITE_DEFAULT_LANGUAGE:-EN}
     depends_on:
       # Solo inicia cuando el backend está disponible
       - backend
