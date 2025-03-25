@@ -2,6 +2,16 @@
 
 Este repositorio contiene los archivos de configuración necesarios para desplegar la aplicación completa Stock Advisor, incluyendo componentes de frontend, backend y base de datos.
 
+## Requisitos Previos
+
+Antes de comenzar, asegúrate de tener instalado:
+
+- **Git** (versión 2.0+) para clonar los repositorios
+- **Docker Engine** (versión 20.10+)
+- **Docker Compose** (versión 2.0+)
+- 4GB de RAM (mínimo)
+- 10GB de espacio libre en disco
+
 ## Descripción General
 
 La aplicación Stock Advisor es una solución completa que incluye:
@@ -12,21 +22,39 @@ La aplicación Stock Advisor es una solución completa que incluye:
 
 ## Inicio Rápido
 
-La forma más sencilla de poner todo en funcionamiento es usar los scripts proporcionados:
-
+1. Primero, clona este repositorio de despliegue:
 ```bash
-# Hacer todos los scripts ejecutables
-chmod +x scripts/*.sh
+git clone https://github.com/julianloaiza/stock-advisor-deployment.git
+cd stock-advisor-deployment
+```
 
-# Ejecutar el script de configuración
+2. Haz todos los scripts ejecutables:
+```bash
+chmod +x scripts/*.sh
+```
+
+3. Ejecuta el script de configuración:
+```bash
 ./scripts/setup.sh
 ```
 
 Esto automáticamente:
-1. Verificará las dependencias requeridas
-2. Clonará los repositorios necesarios
-3. Verificará el script de inicialización de la base de datos
-4. Lanzará toda la pila de aplicaciones
+- Verificará las dependencias requeridas
+- Clonará los repositorios necesarios
+- Verificará el script de inicialización de la base de datos
+- Creará un archivo `.env` desde `.env.example`
+
+4. **IMPORTANTE**: Edita el archivo `.env` para configurar tu entorno, especialmente:
+```
+STOCK_AUTH_TKN=tu_token_real_aquí
+```
+
+Este token es **obligatorio** para que el backend se conecte a la API externa de datos de acciones. Sin un token válido, la sincronización fallará.
+
+5. Inicia la aplicación:
+```bash
+./scripts/start.sh
+```
 
 Al final del proceso de configuración, se te preguntará si deseas iniciar los servicios inmediatamente. Si eliges 'sí', el script ejecutará automáticamente `start.sh` por ti.
 
@@ -52,7 +80,13 @@ mkdir -p sql
 # El script init-db.sql ya está incluido en el repositorio
 ```
 
-3. Iniciar la aplicación:
+3. Crea y configura `.env`:
+```bash
+cp .env.example .env
+# Edita el archivo .env para establecer tu configuración, especialmente STOCK_AUTH_TKN
+```
+
+4. Inicia la aplicación:
 ```bash
 docker-compose up -d
 ```
@@ -64,6 +98,27 @@ Una vez en funcionamiento, los componentes de la aplicación están disponibles 
 - **Frontend**: http://localhost:5173 (o el puerto configurado en `.env`)
 - **Documentación de la API**: http://localhost:8080/swagger/index.html (o usando el puerto de backend configurado)
 - **Administrador de Base de Datos**: http://localhost:9090 (o el puerto configurado en `.env`)
+
+## Configuración
+
+La aplicación es completamente configurable a través del archivo `.env`. Las opciones clave de configuración incluyen:
+
+- **STOCK_AUTH_TKN**: Token de autenticación para la API externa (obligatorio)
+- **STOCK_API_URL**: URL de la API externa de datos de acciones
+- **DATABASE_URL**: Cadena de conexión a la base de datos
+- **Puertos de servicio**: Para todos los componentes (frontend, backend, base de datos)
+- **VITE_API_BASE_URL**: URL donde el frontend se conectará para acceder al backend
+- **VITE_DEFAULT_LANGUAGE**: Idioma predeterminado para la interfaz de usuario del frontend
+
+Aquí hay una breve explicación de las variables más importantes:
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| STOCK_AUTH_TKN | Token de autenticación para API externa | tkn_ejemplo123 |
+| STOCK_API_URL | URL para datos de acciones externos | https://api.ejemplo.com/stocks |
+| VITE_API_BASE_URL | URL del backend (para que se conecte el frontend) | http://localhost:8080 |
+| BACKEND_PORT | Puerto para el servicio backend | 8080 |
+| FRONTEND_PORT | Puerto para el servicio frontend | 5173 |
 
 ## Estructura del Repositorio
 
@@ -86,17 +141,6 @@ stock-advisor-deployment/
     ├── stock-advisor-frontend/
     └── stock-advisor-backend/
 ```
-
-## Configuración
-
-La aplicación es completamente configurable a través del archivo `.env`. Las opciones clave de configuración incluyen:
-
-- **Configuración de base de datos**: Usuario, nombre de la base de datos
-- **Puertos de servicio**: Para todos los componentes (frontend, backend, base de datos)
-- **Configuración de API**: URL, token de autenticación
-- **Configuración de frontend**: URL de API, idioma predeterminado
-
-Puedes editar el archivo `.env` para personalizar el despliegue según tus necesidades.
 
 ## Repositorios de Componentes
 
@@ -121,13 +165,12 @@ El repositorio incluye varios scripts de utilidad para ayudar a gestionar la apl
 Si encuentras algún problema:
 
 1. **Revisar logs**: `docker-compose logs -f [nombre_servicio]` (ej., `backend`, `frontend`, o `cockroach`)
-2. **Reiniciar servicios**: Ejecuta `./scripts/reset.sh`
-3. **Reconstruir contenedores**: `docker-compose up -d --build`
-4. **Verificar variables de entorno**: Asegúrate de que todas las variables requeridas estén configuradas en el archivo `.env`
+2. **Verificar variables de entorno**: Asegúrate de que `STOCK_AUTH_TKN` y otras variables estén correctamente configuradas en el archivo `.env`
+3. **Reiniciar servicios**: Ejecuta `./scripts/reset.sh`
+4. **Reconstruir contenedores**: `docker-compose up -d --build`
 
-## Requisitos del Sistema
+### Problemas comunes
 
-- Docker Engine 20.10+
-- Docker Compose 2.0+
-- 4GB RAM (mínimo)
-- 10GB de espacio libre en disco
+- **La sincronización falla**: Generalmente significa que el `STOCK_AUTH_TKN` falta o es incorrecto
+- **El frontend no puede conectarse al backend**: Verifica el `VITE_API_BASE_URL` en `.env`
+- **Error de conexión a la base de datos**: Verifica que la base de datos esté ejecutándose y que `DATABASE_URL` sea correcto
