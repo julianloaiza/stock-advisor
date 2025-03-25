@@ -66,7 +66,7 @@ services:
       # Variables de entorno para configurar el backend
       - ADDRESS=:8080
       # Conexión en modo inseguro para desarrollo
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@cockroach:26257/stock_db?sslmode=disable
+      - DATABASE_URL=postgresql://${DB_USER}@cockroach:26257/stock_db?sslmode=disable
       - STOCK_API_URL=https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list
       - STOCK_AUTH_TKN=${STOCK_AUTH_TKN}
       - SYNC_MAX_ITERATIONS=100
