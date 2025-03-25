@@ -41,3 +41,15 @@ else
     }
     echo -e "${GREEN}Services restarted successfully.${NC}"
 fi
+
+# Obtener variables de entorno para mensajes
+BACKEND_PORT=$(grep -oP 'BACKEND_PORT=\K[0-9]+' .env 2>/dev/null || echo "8080")
+FRONTEND_PORT=$(grep -oP 'FRONTEND_PORT=\K[0-9]+' .env 2>/dev/null || echo "5173")
+COCKROACH_UI_PORT=$(grep -oP 'COCKROACH_UI_PORT=\K[0-9]+' .env 2>/dev/null || echo "9090")
+
+# Mostrar información de acceso a las aplicaciones
+echo -e "${BLUE}Access the applications:${NC}"
+echo -e "${BLUE}- Frontend: http://localhost:${FRONTEND_PORT}${NC}"
+echo -e "${BLUE}- API Backend: http://localhost:${BACKEND_PORT}${NC}"
+echo -e "${BLUE}- API Swagger: http://localhost:${BACKEND_PORT}/swagger/index.html${NC}"
+echo -e "${BLUE}- CockroachDB Admin: http://localhost:${COCKROACH_UI_PORT}${NC}"
