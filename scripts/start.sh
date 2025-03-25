@@ -18,13 +18,46 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-# Iniciar servicios con Docker Compose
-echo -e "${BLUE}Starting services...${NC}"
-docker-compose up -d || {
-    echo -e "${RED}Error: Failed to start services.${NC}"
-    echo -e "${YELLOW}Check if Docker is running and try again.${NC}"
-    exit 1
-}
+# Verificar si hay contenedores existentes y su estado
+EXISTING_CONTAINERS=$(docker-compose ps -q 2>/dev/null)
+
+if [ -n "$EXISTING_CONTAINERS" ]; then
+    # Verificar si hay al menos un contenedor detenido
+    STOPPED_CONTAINERS=$(docker-compose ps --services --filter "status=stopped" 2>/dev/null)
+    
+    if [ -n "$STOPPED_CONTAINERS" ]; then
+        echo -e "${BLUE}Restarting previously stopped services...${NC}"
+        docker-compose start || {
+            echo -e "${YELLOW}Warning: Could not restart some services. Attempting to recreate...${NC}"
+            docker-compose up -d || {
+                echo -e "${RED}Error: Failed to start services.${NC}"
+                echo -e "${YELLOW}Check if Docker is running and try again.${NC}"
+                exit 1
+            }
+        }
+    else
+        # Verificar si hay contenedores en ejecución
+        RUNNING_CONTAINERS=$(docker-compose ps --services --filter "status=running" 2>/dev/null)
+        
+        if [ -n "$RUNNING_CONTAINERS" ]; then
+            echo -e "${YELLOW}Some services are already running.${NC}"
+            echo -e "${BLUE}Ensuring all services are up...${NC}"
+            docker-compose up -d || {
+                echo -e "${RED}Error: Failed to start services.${NC}"
+                echo -e "${YELLOW}Check if Docker is running and try again.${NC}"
+                exit 1
+            }
+        fi
+    fi
+else
+    # No hay contenedores, se inicia desde cero
+    echo -e "${BLUE}Starting services...${NC}"
+    docker-compose up -d || {
+        echo -e "${RED}Error: Failed to start services.${NC}"
+        echo -e "${YELLOW}Check if Docker is running and try again.${NC}"
+        exit 1
+    }
+fi
 
 # Obtener variables de entorno para mensajes
 BACKEND_PORT=$(grep -oP 'BACKEND_PORT=\K[0-9]+' .env 2>/dev/null || echo "8080")

@@ -20,9 +20,6 @@ chmod +x scripts/*.sh
 
 # Ejecutar el script de configuración
 ./scripts/setup.sh
-
-# Iniciar los servicios
-./scripts/start.sh
 ```
 
 Esto automáticamente:
@@ -30,6 +27,8 @@ Esto automáticamente:
 2. Clonará los repositorios necesarios
 3. Verificará el script de inicialización de la base de datos
 4. Lanzará toda la pila de aplicaciones
+
+Al final del proceso de configuración, se te preguntará si deseas iniciar los servicios inmediatamente. Si eliges 'sí', el script ejecutará automáticamente `start.sh` por ti.
 
 ## Configuración Manual
 
@@ -111,10 +110,11 @@ La aplicación está dividida en dos repositorios principales:
 El repositorio incluye varios scripts de utilidad para ayudar a gestionar la aplicación:
 
 - **setup.sh**: Configuración inicial del entorno
-- **start.sh**: Iniciar todos los servicios
-- **stop.sh**: Detener todos los servicios
+- **start.sh**: Iniciar todos los servicios (también puede reiniciar servicios después de shutdown o stop)
+- **stop.sh**: Detener todos los servicios temporalmente (mantiene los contenedores)
+- **shutdown.sh**: Apagar todos los servicios (elimina los contenedores pero preserva los volúmenes de datos)
 - **reset.sh**: Reiniciar servicios (con o sin datos)
-- **remove.sh**: Eliminar todos los contenedores, volúmenes y redes
+- **remove.sh**: Eliminar todos los contenedores, volúmenes y redes (limpieza completa)
 
 ## Solución de Problemas
 

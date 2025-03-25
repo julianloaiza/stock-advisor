@@ -20,9 +20,6 @@ chmod +x scripts/*.sh
 
 # Run the setup script
 ./scripts/setup.sh
-
-# Start the services
-./scripts/start.sh
 ```
 
 This will automatically:
@@ -30,6 +27,8 @@ This will automatically:
 2. Clone the necessary repositories
 3. Verify the database initialization script
 4. Launch the entire application stack
+
+At the end of the setup process, you'll be asked if you want to start the services immediately. If you choose 'yes', the script will automatically run `start.sh` for you.
 
 ## Manual Setup
 
@@ -111,10 +110,11 @@ The application is split across two main repositories:
 The repository includes several utility scripts to help manage the application:
 
 - **setup.sh**: Initial setup of the environment
-- **start.sh**: Start all services
-- **stop.sh**: Stop all services
+- **start.sh**: Start all services (can also restart services after shutdown or stop)
+- **stop.sh**: Stop all services temporarily (keeps containers)
+- **shutdown.sh**: Shut down all services (removes containers but preserves data volumes)
 - **reset.sh**: Reset services (with or without data)
-- **remove.sh**: Remove all containers, volumes, and networks
+- **remove.sh**: Remove all containers, volumes, and networks (complete cleanup)
 
 ## Troubleshooting
 

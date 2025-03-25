@@ -29,12 +29,7 @@ echo -e "${BLUE}Creating necessary directories...${NC}"
 mkdir -p repositories
 mkdir -p sql
 
-# Verificar y copiar .env.example a .env si es necesario
-if [ ! -f .env.example ]; then
-    echo -e "${RED}Error: .env.example file not found.${NC}"
-    exit 1
-fi
-
+# Verificar que el archivo .env existe
 if [ ! -f .env ]; then
     echo -e "${BLUE}Creating .env file from example...${NC}"
     cp .env.example .env
@@ -91,4 +86,13 @@ EOF
 fi
 
 echo -e "${GREEN}Setup completed successfully.${NC}"
-echo -e "${YELLOW}To start the services, run: ./start.sh${NC}"
+
+# Preguntar si desea iniciar los servicios ahora
+echo -e "${YELLOW}Do you want to start the services now? (y/n)${NC}"
+read -r response
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    echo -e "${BLUE}Starting services...${NC}"
+    ./scripts/start.sh
+else
+    echo -e "${BLUE}You can start the services later with: ./scripts/start.sh${NC}"
+fi
